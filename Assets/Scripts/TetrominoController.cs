@@ -55,8 +55,13 @@ public class TetrominoController : MonoBehaviour
             transform.position += new Vector3(0, -1, 0);
             fall = Time.time;
 
-            if ( !IsValidPosition() )
+            if ( !IsValidPosition() ) {
                 transform.position += new Vector3(0, 1, 0);
+                
+                // Disable this tetromino controller and spawn another piece.
+                enabled = false;
+                FindObjectOfType<GameManager>().SpawnNextTetromino();
+            }
         }
     }
 
