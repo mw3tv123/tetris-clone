@@ -5,6 +5,7 @@ using UnityEngine;
 public class TetrominoController : MonoBehaviour
 {
     Vector3 rotationAngle = new Vector3(0, 0, 90);
+    GameManager gameManager;
 
     float fall = 0f;
     public float fallSpeed = 1f;
@@ -14,7 +15,7 @@ public class TetrominoController : MonoBehaviour
 
     // Start is called before the first frame update
     void Start() {
-        
+        gameManager = FindObjectOfType<GameManager>();
     }
 
     // Update is called once per frame
@@ -27,14 +28,18 @@ public class TetrominoController : MonoBehaviour
         if ( Input.GetKeyDown(KeyCode.RightArrow) ) {
             transform.position += new Vector3(1, 0, 0);
             
-            if ( !IsValidPosition() )
+            if ( IsValidPosition() )
+                gameManager.UpdateGrid(this);
+            else
                 transform.position += new Vector3(-1, 0, 0);
         }
         // Move tetromino to the left.
         else if ( Input.GetKeyDown(KeyCode.LeftArrow) ) {
             transform.position += new Vector3(-1, 0, 0);
 
-            if ( !IsValidPosition() )
+            if ( IsValidPosition() )
+                gameManager.UpdateGrid(this);
+            else
                 transform.position += new Vector3(1, 0, 0);
         }
         // Rotation tetromino.
@@ -47,7 +52,9 @@ public class TetrominoController : MonoBehaviour
             transform.Rotate(rotationAngle);
 
             // If tetromino is out of grid border, rotate back to original position.
-            if ( !IsValidPosition() )
+            if ( IsValidPosition() )
+                gameManager.UpdateGrid(this);
+            else
                 transform.Rotate(0, 0, -rotationAngle.z);
         }
         // Move tetromino down.
@@ -55,21 +62,26 @@ public class TetrominoController : MonoBehaviour
             transform.position += new Vector3(0, -1, 0);
             fall = Time.time;
 
-            if ( !IsValidPosition() ) {
+            if ( IsValidPosition() )
+                gameManager.UpdateGrid(this);
+            else {
                 transform.position += new Vector3(0, 1, 0);
                 
                 // Disable this tetromino controller and spawn another piece.
                 enabled = false;
-                FindObjectOfType<GameManager>().SpawnNextTetromino();
+                gameManager.SpawnNextTetromino();
             }
         }
     }
 
     bool IsValidPosition () {
         foreach ( Transform mino in transform ) {
-            Vector2 position = FindObjectOfType<GameManager>().Round(mino.position);
+            Vector2 position = gameManager.Round(mino.position);
 
-            if ( !FindObjectOfType<GameManager>().CheckInsideGrid(position) )
+            if ( !gameManager.CheckInsideGrid(position) )
+                return false;
+            
+            if ( gameManager.GetMinoAtGridPosition(position) != null && gameManager.GetMinoAtGridPosition(position).parent != transform )
                 return false;
         }
         return true;
