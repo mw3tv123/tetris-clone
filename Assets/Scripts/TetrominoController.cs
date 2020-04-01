@@ -58,7 +58,7 @@ public class TetrominoController : MonoBehaviour
                 transform.Rotate(0, 0, -rotationAngle.z);
         }
         // Move tetromino down.
-        else if ( Input.GetKeyDown(KeyCode.DownArrow) || Time.time - fall >= fallSpeed ) {
+        else if ( Input.GetKey(KeyCode.DownArrow) || Time.time - fall >= fallSpeed ) {
             transform.position += new Vector3(0, -1, 0);
             fall = Time.time;
 
@@ -66,6 +66,8 @@ public class TetrominoController : MonoBehaviour
                 gameManager.UpdateGrid(this);
             else {
                 transform.position += new Vector3(0, 1, 0);
+                
+                gameManager.DeleteRow();
                 
                 // Disable this tetromino controller and spawn another piece.
                 enabled = false;

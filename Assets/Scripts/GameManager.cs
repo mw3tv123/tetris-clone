@@ -9,18 +9,11 @@ public class GameManager : MonoBehaviour
     public static Transform[,] grid = new Transform[gridWidth, gridHeight];
 
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start ( ) {
         SpawnNextTetromino();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    private string GetRandomTetromino () {
+    private string GetRandomTetromino ( ) {
         string randomTetrominoName = "Prefabs/";
         int randomTetromino = Random.Range(1, 8);
         switch (randomTetromino) {
@@ -63,7 +56,7 @@ public class GameManager : MonoBehaviour
                                                            Quaternion.identity);
     }
 
-    public void UpdateGrid (TetrominoController tetromino) {
+    public void UpdateGrid ( TetrominoController tetromino ) {
         for ( int y = 0; y < gridHeight; y++ ) {
             for ( int x = 0; x < gridWidth; x++ ) {
                 if ( grid[x, y] != null ) {
@@ -87,5 +80,47 @@ public class GameManager : MonoBehaviour
             return null;
         else 
             return grid[(int)position.x, (int)position.y];
+    }
+    
+    public bool IsFullRowAt ( int y ) {
+        for ( int x = 0; x < gridWidth; ++x ) {
+            if ( grid[x, y] == null )
+                return false;
+        }
+        return true;
+    }
+
+    // Wipes out all mino(s) at row y.
+    public void DeleteMinoRowAt ( int y ) {
+        for ( int x = 0; x < gridWidth; ++x ) {
+            Destroy(grid[x, y].gameObject);
+            grid[x, y] = null;
+        }
+    }
+
+    // Move the upper row down a unit.
+    public void MoveRowDown ( int y ) {
+        for ( int x = 0; x < gridWidth; ++x ) {
+            if ( grid[x, y] != null ) {
+                grid[x, y-1] = grid[x, y];                      // Change reference to lower row
+                grid[x, y] = null;                              // Remove reference from upper row
+                grid[x, y-1].position += new Vector3(0, -1, 0); // Change position of mino to y-1
+            }
+        }
+    }
+
+    public void MoveAllRowsDown ( int y ) {
+        for ( int i = y; i < gridHeight; ++i )
+            MoveRowDown(i);
+    }
+
+    public void DeleteRow ( ) {
+        for ( int y = 0; y < gridWidth; ++y ) {
+            if ( IsFullRowAt(y) ) {
+                DeleteMinoRowAt(y);
+                MoveAllRowsDown(y);
+                --y;
+            }
+        }
     }
 }
