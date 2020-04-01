@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
@@ -7,9 +9,27 @@ public class GameManager : MonoBehaviour
     public static int gridHeight = 20;
     public static Transform[,] grid = new Transform[gridWidth, gridHeight];
 
+    public int numberOfRowsErased = 0;
+    public Text scoreUI;
+    private int currentScore = 0;
+
+    // Number of score equal to number of line erase at the same time.
+    public Dictionary<int, int> ComboScore  = new Dictionary<int, int> {
+        {1, 50}, {2, 150}, {3, 300}, {4, 500}
+    };
+
     // Start is called before the first frame update
-    void Start ( ) {
-        SpawnNextTetromino();
+    void Start ( ) => SpawnNextTetromino();
+
+    void Update ( ) => UpdateScore();
+
+    // Constantly check number of row has been erased to update current score.
+    public void UpdateScore ( ) {
+        if ( numberOfRowsErased > 0 ) { 
+            currentScore += ComboScore[numberOfRowsErased];
+            scoreUI.text = currentScore.ToString();
+        }
+        numberOfRowsErased = 0;
     }
 
     private string GetRandomTetromino ( ) {
@@ -83,9 +103,12 @@ public class GameManager : MonoBehaviour
     
     public bool IsFullRowAt ( int y ) {
         for ( int x = 0; x < gridWidth; ++x ) {
+            // Return false if there is a empty cell in current row.
             if ( grid[x, y] == null )
                 return false;
         }
+        // This row is fill up with mino.
+        numberOfRowsErased++;
         return true;
     }
 
