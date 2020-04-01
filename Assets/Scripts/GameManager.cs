@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -51,8 +50,8 @@ public class GameManager : MonoBehaviour
     }
 
     public void SpawnNextTetromino () {
-        GameObject nextTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)),
-                                                           new Vector2(4.0f, 17.0f),
+        GameObject nextTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(),typeof(GameObject)),
+                                                           new Vector2(4.0f, 21.0f),
                                                            Quaternion.identity);
     }
 
@@ -123,4 +122,19 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+    
+    // Check if the last tetromino is reach the top of the grid.
+    public bool IsAboveGrid ( TetrominoController tetromino ) {
+        for ( int x = 0; x < gridWidth; x++ ) {
+            foreach ( Transform mino in tetromino.transform ) {
+                Vector2 position = Round(mino.position);
+                if ( position.y > gridHeight )
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    // Move to Game Over scene.
+    public void GameOver ( ) => SceneManager.LoadScene("GameOver");
 }

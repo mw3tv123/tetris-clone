@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class TetrominoController : MonoBehaviour
 {
@@ -67,7 +65,12 @@ public class TetrominoController : MonoBehaviour
             else {
                 transform.position += new Vector3(0, 1, 0);
                 
+                // Remove any row that is full.
                 gameManager.DeleteRow();
+
+                // If this tetro reachs out gridHight, then game is over.
+                if ( gameManager.IsAboveGrid(this) )
+                    gameManager.GameOver();
                 
                 // Disable this tetromino controller and spawn another piece.
                 enabled = false;
