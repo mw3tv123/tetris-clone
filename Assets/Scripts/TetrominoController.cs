@@ -19,6 +19,19 @@ public class TetrominoController : MonoBehaviour {
     private AudioSource audioSource;
     #endregion
 
+    #region Controller Optimize
+    private float verticalSpeed = 0.05f;        // The speed the tetromino move down.
+    private float horizontalSpeed = 0.1f;       // The speed the tetromino move left and right.
+    private float buttonDownWaitMax = 0.25f;     // How long before tetromino recognizes the button is being held down.
+
+    private float verticalTimer = 0;
+    private float horizontalTimer = 0;
+    private float buttonDownWaitTimer = 0;
+
+    private bool movedImmediateHorizontal = false;
+    private bool movedImmediateVertical = false;
+    #endregion
+
     // Start is called before the first frame update
     void Start() {
         gameManager = FindObjectOfType<GameManager>();
@@ -31,8 +44,35 @@ public class TetrominoController : MonoBehaviour {
     }
 
     void CheckUserInput() {
+
+        if ( Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.DownArrow) ) {
+            movedImmediateHorizontal = false;
+            movedImmediateVertical = false;
+            
+            horizontalTimer = 0;
+            verticalTimer = 0;
+            buttonDownWaitTimer = 0;
+        }
+
         // Move tetromino to the right.
-        if ( Input.GetKeyDown(KeyCode.RightArrow) ) {
+        if ( Input.GetKey(KeyCode.RightArrow) ) {
+            if ( movedImmediateHorizontal ) {
+                if ( buttonDownWaitTimer < buttonDownWaitMax ) {
+                    buttonDownWaitTimer += Time.deltaTime;
+                    return;
+                }
+
+                if ( horizontalTimer < horizontalSpeed ) {
+                    horizontalTimer += Time.deltaTime;
+                    return;
+                }
+            }
+
+            if ( !movedImmediateHorizontal )
+                movedImmediateHorizontal = true;
+
+            horizontalTimer = 0;
+
             transform.position += new Vector3(1, 0, 0);
             
             if ( IsValidPosition() ) {
@@ -43,7 +83,24 @@ public class TetrominoController : MonoBehaviour {
                 transform.position += new Vector3(-1, 0, 0);
         }
         // Move tetromino to the left.
-        else if ( Input.GetKeyDown(KeyCode.LeftArrow) ) {
+        else if ( Input.GetKey(KeyCode.LeftArrow) ) {
+            if ( movedImmediateHorizontal ) {
+                if ( buttonDownWaitTimer < buttonDownWaitMax ) {
+                    buttonDownWaitTimer += Time.deltaTime;
+                    return;
+                }
+                
+                if ( horizontalTimer < horizontalSpeed ) {
+                    horizontalTimer += Time.deltaTime;
+                    return;
+                }
+            }
+
+            if ( !movedImmediateHorizontal )
+                movedImmediateHorizontal = true;
+            
+            horizontalTimer = 0;
+
             transform.position += new Vector3(-1, 0, 0);
 
             if ( IsValidPosition() ) {
@@ -72,6 +129,23 @@ public class TetrominoController : MonoBehaviour {
         }
         // Move tetromino down.
         else if ( Input.GetKey(KeyCode.DownArrow) || Time.time - fall >= fallSpeed ) {
+            if ( movedImmediateVertical ) {
+                if ( buttonDownWaitTimer < buttonDownWaitMax ) {
+                    buttonDownWaitTimer += Time.deltaTime;
+                    return;
+                }
+                
+                if ( verticalTimer < verticalSpeed ) {
+                    verticalTimer += Time.deltaTime;
+                    return;
+                }
+            }
+
+            if ( !movedImmediateVertical )
+                movedImmediateVertical = true;
+
+            verticalTimer = 0;
+
             transform.position += new Vector3(0, -1, 0);
             fall = Time.time;
 
