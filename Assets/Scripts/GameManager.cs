@@ -3,12 +3,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour
-{
+public class GameManager : MonoBehaviour {
+    #region Grid
     public static int gridWidth = 10;
     public static int gridHeight = 20;
     public static Transform[,] grid = new Transform[gridWidth, gridHeight];
+    #endregion
 
+    #region Score
     public int numberOfRowsErased = 0;
     public Text scoreUI;
     private int currentScore = 0;
@@ -17,9 +19,18 @@ public class GameManager : MonoBehaviour
     public Dictionary<int, int> ComboScore  = new Dictionary<int, int> {
         {1, 50}, {2, 150}, {3, 300}, {4, 500}
     };
+    #endregion
+
+    #region SoundFX
+    private AudioSource audioSource;
+    public AudioClip clearRowSFX;
+    #endregion
 
     // Start is called before the first frame update
-    void Start ( ) => SpawnNextTetromino();
+    void Start ( ) {
+        SpawnNextTetromino();
+        audioSource = GetComponent<AudioSource>();
+    }
 
     void Update ( ) => UpdateScore();
 
@@ -28,9 +39,13 @@ public class GameManager : MonoBehaviour
         if ( numberOfRowsErased > 0 ) { 
             currentScore += ComboScore[numberOfRowsErased];
             scoreUI.text = currentScore.ToString();
+            PlayRowClearSFX();
         }
         numberOfRowsErased = 0;
     }
+
+    // This sound effect play when a row is clear.
+    public void PlayRowClearSFX ( ) => audioSource.PlayOneShot(clearRowSFX);
 
     private string GetRandomTetromino ( ) {
         string randomTetrominoName = "Prefabs/";

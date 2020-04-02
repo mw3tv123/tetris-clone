@@ -1,19 +1,28 @@
 ﻿using UnityEngine;
 
-public class TetrominoController : MonoBehaviour
-{
+public class TetrominoController : MonoBehaviour {
     Vector3 rotationAngle = new Vector3(0, 0, 90);
     GameManager gameManager;
 
+    #region Tetromino Properties
     float fall = 0f;
     public float fallSpeed = 1f;
 
     public bool allowRotation = true;
     public bool limitRotation = false;
+    #endregion
+
+    #region SoundFX
+    public AudioClip moveSFX;       // Sound effect play when tetromino move.
+    public AudioClip rotateSFX;     // Sound effect play when tetromino rotate.
+    public AudioClip landSFX;       // Sound effect play when tetromino land.
+    private AudioSource audioSource;
+    #endregion
 
     // Start is called before the first frame update
     void Start() {
         gameManager = FindObjectOfType<GameManager>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -26,8 +35,10 @@ public class TetrominoController : MonoBehaviour
         if ( Input.GetKeyDown(KeyCode.RightArrow) ) {
             transform.position += new Vector3(1, 0, 0);
             
-            if ( IsValidPosition() )
+            if ( IsValidPosition() ) {
                 gameManager.UpdateGrid(this);
+                PlayAudio(moveSFX);
+            }
             else
                 transform.position += new Vector3(-1, 0, 0);
         }
@@ -35,8 +46,10 @@ public class TetrominoController : MonoBehaviour
         else if ( Input.GetKeyDown(KeyCode.LeftArrow) ) {
             transform.position += new Vector3(-1, 0, 0);
 
-            if ( IsValidPosition() )
+            if ( IsValidPosition() ) {
                 gameManager.UpdateGrid(this);
+                PlayAudio(moveSFX);
+            }
             else
                 transform.position += new Vector3(1, 0, 0);
         }
@@ -50,8 +63,10 @@ public class TetrominoController : MonoBehaviour
             transform.Rotate(rotationAngle);
 
             // If tetromino is out of grid border, rotate back to original position.
-            if ( IsValidPosition() )
+            if ( IsValidPosition() ) {
                 gameManager.UpdateGrid(this);
+                PlayAudio(rotateSFX);
+            }
             else
                 transform.Rotate(0, 0, -rotationAngle.z);
         }
@@ -64,6 +79,7 @@ public class TetrominoController : MonoBehaviour
                 gameManager.UpdateGrid(this);
             else {
                 transform.position += new Vector3(0, 1, 0);
+                PlayAudio(landSFX);
                 
                 // Remove any row that is full.
                 gameManager.DeleteRow();
@@ -78,6 +94,11 @@ public class TetrominoController : MonoBehaviour
             }
         }
     }
+
+    /// <summary>
+    ///  Play a sound FX one time.
+    /// </summary>
+    void PlayAudio ( AudioClip audio ) => audioSource.PlayOneShot(audio);
 
     bool IsValidPosition () {
         foreach ( Transform mino in transform ) {
