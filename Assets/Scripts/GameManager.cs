@@ -26,6 +26,18 @@ public class GameManager : MonoBehaviour {
     public AudioClip clearRowSFX;
     #endregion
 
+    #region Preview Tetromino
+    private GameObject previewTetromino;
+    private GameObject nextTetromino;
+
+    private bool gameStarted = false;
+
+    [SerializeField]
+    private Vector2 previewTetrominoPosition;
+    [SerializeField]
+    private Vector2 instantiatePosition;
+    #endregion
+
     // Start is called before the first frame update
     void Start ( ) {
         SpawnNextTetromino();
@@ -85,9 +97,27 @@ public class GameManager : MonoBehaviour {
     }
 
     public void SpawnNextTetromino () {
-        GameObject nextTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(),typeof(GameObject)),
-                                                           new Vector2(4.0f, 21.0f),
-                                                           Quaternion.identity);
+        if ( gameStarted ) {
+            nextTetromino = previewTetromino;
+            nextTetromino.transform.position = instantiatePosition;
+            nextTetromino.GetComponent<TetrominoController>().enabled = true;
+
+            previewTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)),
+                                                      previewTetrominoPosition,
+                                                      Quaternion.identity);
+            previewTetromino.GetComponent<TetrominoController>().enabled = false;
+        }
+        else {
+            gameStarted = true;
+            nextTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)),
+                                                    instantiatePosition,
+                                                    Quaternion.identity);
+            
+            previewTetromino = (GameObject)Instantiate(Resources.Load(GetRandomTetromino(), typeof(GameObject)),
+                                                      previewTetrominoPosition,
+                                                      Quaternion.identity);
+            previewTetromino.GetComponent<TetrominoController>().enabled = false;
+        }
     }
 
     public void UpdateGrid ( TetrominoController tetromino ) {
