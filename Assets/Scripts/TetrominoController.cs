@@ -73,14 +73,14 @@ public class TetrominoController : MonoBehaviour {
 
             horizontalTimer = 0;
 
-            transform.position += new Vector3(1, 0, 0);
+            transform.position += Vector3.right;
             
             if ( IsValidPosition() ) {
                 gameManager.UpdateGrid(this);
                 PlayAudio(moveSFX);
             }
             else
-                transform.position += new Vector3(-1, 0, 0);
+                transform.position += Vector3.left;
         }
         // Move tetromino to the left.
         else if ( Input.GetKey(KeyCode.LeftArrow) ) {
@@ -101,14 +101,14 @@ public class TetrominoController : MonoBehaviour {
             
             horizontalTimer = 0;
 
-            transform.position += new Vector3(-1, 0, 0);
+            transform.position += Vector3.left;
 
             if ( IsValidPosition() ) {
                 gameManager.UpdateGrid(this);
                 PlayAudio(moveSFX);
             }
             else
-                transform.position += new Vector3(1, 0, 0);
+                transform.position += Vector3.right;
         }
         // Rotation tetromino.
         else if ( Input.GetKeyDown(KeyCode.UpArrow) && allowRotation ) {
@@ -146,13 +146,13 @@ public class TetrominoController : MonoBehaviour {
 
             verticalTimer = 0;
 
-            transform.position += new Vector3(0, -1, 0);
+            transform.position += Vector3.down;
             fall = Time.time;
 
             if ( IsValidPosition() )
                 gameManager.UpdateGrid(this);
             else {
-                transform.position += new Vector3(0, 1, 0);
+                transform.position += Vector3.up;
                 PlayAudio(landSFX);
                 
                 // Remove any row that is full.
